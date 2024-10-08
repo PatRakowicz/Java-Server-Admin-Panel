@@ -9,45 +9,42 @@ public class UserInterface {
     private JFrame frame;
     private JTextField serverIpField;
     private JButton connectButton;
-    private JTextArea statusArea;
     private ServerConn serverConn;
 
     public UserInterface() {
-        frame = new JFrame("Admin Panel");
-        frame.setSize(600, 400);
+        frame = new JFrame("Connect to Server");
+        frame.setSize(400, 150);
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.setLayout(new BorderLayout());
 
         // Top panel to hold IP input field and Connect button
         JPanel topPanel = new JPanel();
-        topPanel.setLayout(new FlowLayout(FlowLayout.LEFT));
+        topPanel.setLayout(new FlowLayout(FlowLayout.LEFT));  // Align items to the left
 
-        serverIpField = new JTextField(20);
-        serverIpField.setToolTipText("Enter Server IP");
-
+        serverIpField = new JTextField(20);  // Width of 20 columns
+        serverIpField.setToolTipText("Enter Server IP Address");
         connectButton = new JButton("Connect");
 
-        // Adding IP field and button to the top panel
         topPanel.add(new JLabel("Server IP:"));
         topPanel.add(serverIpField);
         topPanel.add(connectButton);
 
-        statusArea = new JTextArea();
-        statusArea.setEditable(false);
-        statusArea.setLineWrap(true);
-        statusArea.setWrapStyleWord(true);
-
-        // Adding components to the frame
         frame.add(topPanel, BorderLayout.NORTH);
-        frame.add(new JScrollPane(statusArea), BorderLayout.CENTER);
 
-        // Action Listener for button
+        // Action Listener for the Connect button
         connectButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
                 String serverIp = serverIpField.getText();
-                serverConn = new ServerConn(serverIp, statusArea);
-                serverConn.connect();
+                serverConn = new ServerConn(serverIp);
+                if (serverConn.connect()) {
+                    // Switch to the Main Page if connected successfully
+                    frame.setVisible(false);
+                    MainPageUI mainPage = new MainPageUI(serverConn);
+                    mainPage.createAndShowUI();
+                } else {
+                    JOptionPane.showMessageDialog(frame, "Connection Failed. Try Again.");
+                }
             }
         });
     }
